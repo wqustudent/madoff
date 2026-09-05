@@ -1,1 +1,3 @@
+nbconvert
+nbformat>=5.10
 polars
