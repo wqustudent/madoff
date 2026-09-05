@@ -13,7 +13,7 @@ class IngesterPrepper:
             self.data_dir / "option-chain" / "nvda_2020_2022.csv",
             # try_parse_dates=True,
         )
-        print(df)
+        # print(df)
         self.option_chain = df
         return df
 
@@ -50,9 +50,10 @@ class IngesterPrepper:
                 pl.col('P_ASK').str.replace_all(r"[\s]", "").cast(pl.Float64, strict=False),
             ).drop_nulls()
         )
-        print(df)
-        print(df.null_count())
-        print(df.describe())
+        # print(df)
+        # print(df.null_count())
+        # print(df.describe())
+        # print(type(df.null_count()))
         self.option_chain = df
         return df
 

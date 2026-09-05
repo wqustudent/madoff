@@ -1,7 +1,5 @@
-download of data from source is required
-- option chain file (nvda_2020_2022.csv) size is ~372MB (> upload limit to github repo) 
-- instead of splitting & uploading & then re-combining during analysis, url to the data is provided
-- so, download the data from source/kaggle to @here
-
-analysis
-- moderately large dataset -> using polars for analysis
+- option chain file (nvda_2020_2022.csv) is moderately big
+  - github does not allow upload of files >100MB in size
+    - url in ./url.txt
+    - download/wget from source to @here
+  - use polars for analysis
