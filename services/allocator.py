@@ -53,7 +53,6 @@ class Allocator:
             contract.rebalance(xs)
 
     def allocate_oct_to_ladder(self, xs, entry_time, chosen_expiry_date):
-        # min_ask_strikes = Oct().find_valley(xs)
         print("\nallocating oct_ to ladder.")
         oct_ = Oct()
         cf = oct_.enter_market(xs)
@@ -94,8 +93,6 @@ class Allocator:
             (pl.col("C_ASK") + pl.col("P_ASK")).alias("PAIR_ASK"),
             (pl.col("C_BID") + pl.col("P_BID")).alias("PAIR_BID"),
         )
-        # print(f"\nfor expiry date: {expiry_date}")
-        # print("external state/speculation is: ", xs)
         return xs
 
 
