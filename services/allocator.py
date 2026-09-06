@@ -17,8 +17,11 @@ class Allocator:
         ).unique().sort("QUOTE_READTIME")[0].item()
 
         available_expiry_dates = self.find_available_expiry_dates(entry_time)
+
         chosen_expiry_date = available_expiry_dates[-1]
         print(f'\nchosen expiry date: {chosen_expiry_date}')
+
+        xs = self.find_external_state(entry_time, chosen_expiry_date)
 
     def ingest_chain(self):
         sub = self.ingester_prepper
@@ -34,6 +37,21 @@ class Allocator:
         )["EXPIRE_DATE"].unique()
         print("\navailable expiry dates: ", available_expiry_dates)
         return available_expiry_dates
+
+    def find_external_state(self, quote_time, expiry_date):
+        df = self.option_chain
+
+        # find external-state or expiry-speculation
+        xs = df.filter(
+            (pl.col("QUOTE_READTIME") == quote_time)
+            & (pl.col("EXPIRE_DATE") == expiry_date)
+        ).with_columns(
+            (pl.col("C_ASK") + pl.col("P_ASK")).alias("PAIR_ASK"),
+            (pl.col("C_BID") + pl.col("P_BID")).alias("PAIR_BID"),
+        )
+        print(f"\nfor expiry date: {expiry_date}")
+        print("external state/speculation is: ", xs)
+        return xs
 
 
 if __name__ == '__main__':
