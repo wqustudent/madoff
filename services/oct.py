@@ -1,5 +1,6 @@
 import pprint
 
+import numpy as np
 import polars as pl
 
 
@@ -12,16 +13,52 @@ class Oct:
         self.pp = pprint.PrettyPrinter(indent=2)
 
     def rebalance(self, xs):
-        collection_moves = self.evaluate_if_cash_collection_possible(xs)
+        collection_moves = self._evaluate_if_move_to_collect_cash(xs)
         if collection_moves:
-            pass
+            underlying_last = xs[0, "UNDERLYING_LAST"]
+            chosen_move = self._choose_patient_greedy_move(collection_moves, underlying_last)
 
-    def evaluate_if_cash_collection_possible(self, xs):
+    @staticmethod
+    def _choose_patient_greedy_move(collection_moves, underlying_last):
+        print(f"\n{'=' * 50}")
+        print(f'choosing patient-greedy move from below "collection moves" given that {underlying_last=}')
+        df = pl.DataFrame({
+            "FROM_STRIKE": [d.get("from_strike") for d in collection_moves],
+            "TO_STRIKE": [d.get("to_strike") for d in collection_moves],
+            "EXP_CF": [d.get("exp_cf") for d in collection_moves],
+        })
+        print(df)
+
+        # patient: move to strike with maximum intrinsic value
+        df = df.with_columns(
+            np.abs(pl.col("TO_STRIKE") - underlying_last).alias("INTRINSIC"),
+        ).sort("INTRINSIC", descending=True)
+        print("\nadded intrinsic value of to_strikes", df)
+        highest_intrinsic = df[0, "INTRINSIC"]
+        print(f"{highest_intrinsic=:.2f}")
+        df = df.filter(
+            pl.col("INTRINSIC") == highest_intrinsic
+        )
+        print("\nfiltered to highest intrinsic: ", df)
+
+        # greedy: move from strike which gives maximum cash collection
+        chosen_move = df.sort(
+            "EXP_CF", descending=True
+        ).select(
+            pl.col("FROM_STRIKE"),
+            pl.col("TO_STRIKE"),
+            pl.col("EXP_CF"),
+        )[0]
+        print("\nchosen move", chosen_move)
+        return chosen_move
+
+    def _evaluate_if_move_to_collect_cash(self, xs):
         print(f"\nevaluating external state: {xs}")
         min_ask_strikes = self._find_valley(xs)
         collection_moves = []
         for to_strike in min_ask_strikes:
-            print(f"\n{'-'*50}")
+            to_strike_moves = []
+            print(f"\n{'-' * 50}")
             print(f"assessing move {to_strike=}")
 
             move_direction = self._find_move_direction(to_strike=to_strike)
@@ -36,14 +73,19 @@ class Oct:
                 print(f"{exp_cf=:.2f} if moving {from_strike=} {to_strike=}")
                 if exp_cf > 0:
                     # collection_moves.append((from_strike, to_strike, exp_cf))
-                    collection_moves.append({
+                    to_strike_moves.append({
                         "from_strike": from_strike,
                         "to_strike": to_strike,
                         "exp_cf": exp_cf
                     })
+            if strikes_in_play and len(to_strike_moves) == len(strikes_in_play):  # patient move; wait for valley to sufficiently move away
+                print(f"all strikes in play can move {to_strike=} and yield +ve cash flow")
+                print('so, appending these moves to "cash collection moves"')
+                collection_moves += to_strike_moves
+            else:
+                print("insufficient external change --> WAIT")
 
-            print(f"can collect cash with collection moves:")
-            self.pp.pprint(collection_moves)
+        print(f"can collect cash with {len(collection_moves)} collection moves:")
         return collection_moves
 
     def _find_move_direction(self, to_strike):
@@ -55,7 +97,7 @@ class Oct:
             move_direction = "DOWN"
         elif to_strike not in at_strikes:
             move_direction = "IN"
-        else: # already positioned at to_strike
+        else:  # already positioned at to_strike
             move_direction = None
         if move_direction is not None:
             print(f"{to_strike=} is in the ask valley and not in current positions @{at_strikes}")
