@@ -1,3 +1,5 @@
+import pprint
+
 import polars as pl
 
 
@@ -11,6 +13,76 @@ class Oct:
             self.settlement_guarantee = (s3-s0) + (s2-s1)
         else:
             self.settlement_guarantee = None
+
+        self.pp = pprint.PrettyPrinter(indent=2)
+
+    def rebalance(self, xs):
+        collection_moves = self.evaluate_if_cash_collection_possible(xs)
+
+    def evaluate_if_cash_collection_possible(self, xs):
+        print(f"\nevaluating external state: {xs}")
+        min_ask_strikes = self.find_valley(xs)
+        collection_moves = []
+        for to_strike in min_ask_strikes:
+            print(f"\n{'-'*50}")
+            print(f"assessing move {to_strike=}")
+
+            move_direction = self._find_move_direction(to_strike=to_strike)
+            print(f"{move_direction=}")
+
+            strikes_in_play = self._strikes_in_play(move_direction)
+            print(f"{strikes_in_play=}")
+
+            for from_strike in strikes_in_play:
+                # evaluate expected cash flow
+                exp_cf = self._expected_cash_flow(xs, from_strike=from_strike, to_strike=to_strike)
+                print(f"{exp_cf=:.2f} if moving {from_strike=} {to_strike=}")
+                if exp_cf > 0:
+                    # collection_moves.append((from_strike, to_strike, exp_cf))
+                    collection_moves.append({
+                        "from_strike": from_strike,
+                        "to_strike": to_strike,
+                        "exp_cf": exp_cf
+                    })
+
+            print(f"can collect cash with collection moves:")
+            self.pp.pprint(collection_moves)
+        return collection_moves
+
+    def _find_move_direction(self, to_strike):
+        at_strikes = sorted(self.strikes)
+        s0, s1, s2, s3 = at_strikes
+        if to_strike > s3:
+            move_direction = "UP"
+        elif to_strike < s0:
+            move_direction = "DOWN"
+        elif to_strike not in at_strikes:
+            move_direction = "IN"
+        else: # already positioned at to_strike
+            move_direction = None
+        if move_direction is not None:
+            print(f"{to_strike=} is in the ask valley and not in current positions @{at_strikes}")
+        return move_direction
+
+    def _strikes_in_play(self, move):
+        s0, s1, s2, s3 = sorted(self.strikes)
+        if move == "UP":
+            return [s1, s2, s3]
+        elif move == "DOWN":
+            return [s0, s1, s2]
+        elif move == "IN":
+            return [s1, s2]
+        return []
+
+    @staticmethod
+    def _expected_cash_flow(xs, from_strike, to_strike):
+        in_ = xs.filter(
+            pl.col("STRIKE") == from_strike
+        )["PAIR_BID"].item()
+        out = xs.filter(
+            pl.col("STRIKE") == to_strike
+        )["PAIR_ASK"].item()
+        return in_ - out
 
     def find_valley(self, xs):
         min_ask_strikes = xs.select(
