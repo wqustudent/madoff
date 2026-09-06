@@ -37,12 +37,25 @@ class Allocator:
         print(f'\nchosen expiry date: {chosen_expiry_date}')
 
         xs = self.find_external_state(entry_time, chosen_expiry_date)
-        self.allocate_oct_to_ladder(xs, entry_time, chosen_expiry_date)
+        contract = self.allocate_oct_to_ladder(xs, entry_time, chosen_expiry_date)
+
+        quote_times = df.filter(
+            pl.col("EXPIRE_DATE") == chosen_expiry_date
+        )["QUOTE_READTIME"].unique().sort()
+        print(f"\nquote times for expiry {chosen_expiry_date}: {quote_times}")
+
+        for qt in quote_times[:100]:  # TODO: remove slice after qual-check
+            xs = self.find_external_state(qt, chosen_expiry_date)
+            print(f"\n\n{'*'*20} ********************************** {'*'*20}")
+            print(f"{'*'*20} EVALUATING REBALANCING OPPORTUNITY {'*'*20}")
+            print(f"{'*'*17} ({qt=}) {'*'*16}")
+            print(f"{'*'*20} ********************************** {'*'*20}")
+            contract.rebalance(xs)
 
     def allocate_oct_to_ladder(self, xs, entry_time, chosen_expiry_date):
-        min_ask_strikes = Oct().find_valley(xs)
+        # min_ask_strikes = Oct().find_valley(xs)
         print("\nallocating oct_ to ladder.")
-        oct_ = Oct(min_ask_strikes)
+        oct_ = Oct()
         cf = oct_.enter_market(xs)
         print(f"{oct_.settlement_guarantee=}")
         # self.ladder[("NVDA", chosen_expiry_date)] = oct_
@@ -53,6 +66,7 @@ class Allocator:
         }
         print("ladder: ")
         self.pp.pprint(self.ladder)
+        return oct_
 
     def ingest_chain(self):
         sub = self.ingester_prepper
@@ -80,8 +94,8 @@ class Allocator:
             (pl.col("C_ASK") + pl.col("P_ASK")).alias("PAIR_ASK"),
             (pl.col("C_BID") + pl.col("P_BID")).alias("PAIR_BID"),
         )
-        print(f"\nfor expiry date: {expiry_date}")
-        print("external state/speculation is: ", xs)
+        # print(f"\nfor expiry date: {expiry_date}")
+        # print("external state/speculation is: ", xs)
         return xs
 
 

@@ -7,21 +7,18 @@ class Oct:
     def __init__(self, strikes=None):
         self.strikes_count = 4
         self.strikes = strikes
-
-        if strikes is not None:
-            s0, s1, s2, s3 = sorted(strikes)
-            self.settlement_guarantee = (s3-s0) + (s2-s1)
-        else:
-            self.settlement_guarantee = None
+        self.settlement_guarantee = None
 
         self.pp = pprint.PrettyPrinter(indent=2)
 
     def rebalance(self, xs):
         collection_moves = self.evaluate_if_cash_collection_possible(xs)
+        if collection_moves:
+            pass
 
     def evaluate_if_cash_collection_possible(self, xs):
         print(f"\nevaluating external state: {xs}")
-        min_ask_strikes = self.find_valley(xs)
+        min_ask_strikes = self._find_valley(xs)
         collection_moves = []
         for to_strike in min_ask_strikes:
             print(f"\n{'-'*50}")
@@ -84,7 +81,7 @@ class Oct:
         )["PAIR_ASK"].item()
         return in_ - out
 
-    def find_valley(self, xs):
+    def _find_valley(self, xs):
         min_ask_strikes = xs.select(
             pl.col("STRIKE"),
             pl.col("PAIR_ASK"),
@@ -107,10 +104,11 @@ class Oct:
         return min_ask_strikes
 
     def enter_market(self, xs):
+        min_ask_strikes = self._find_valley(xs)
         print(f"\nentering the market at strikes: {self.strikes}")
-        if self.strikes is None:
-            print("no strikes defined")
-            return None
+        self.strikes = min_ask_strikes
+        s0, s1, s2, s3 = sorted(min_ask_strikes)
+        self.settlement_guarantee = (s3 - s0) + (s2 - s1)
         cf = 0
         for strike in self.strikes:
             cost = xs.filter(
