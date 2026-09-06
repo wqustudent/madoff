@@ -17,6 +17,21 @@ class Oct:
         if collection_moves:
             underlying_last = xs[0, "UNDERLYING_LAST"]
             chosen_move = self._choose_patient_greedy_move(collection_moves, underlying_last)
+            from_strike, to_strike, exp_cf = chosen_move[0, "FROM_STRIKE"], chosen_move[0, "TO_STRIKE"], chosen_move[0, "EXP_CF"]
+            print(f"moving {from_strike=} --> {to_strike=}; EXPECTED CASH: {exp_cf=:.2f}")
+
+            trader = None  # not using trader/platform for this demonstration
+            prev_guarantee = self.settlement_guarantee
+            if trader:
+                pass
+            else:
+                self.strikes.remove(from_strike)
+                self.strikes.append(to_strike)
+                s0, s1, s2, s3 = sorted(self.strikes)
+                self.settlement_guarantee = (s3 - s0) + (s2 - s1)
+            return exp_cf, self.settlement_guarantee
+        else:
+            return 0, self.settlement_guarantee
 
     @staticmethod
     def _choose_patient_greedy_move(collection_moves, underlying_last):
@@ -78,7 +93,8 @@ class Oct:
                         "to_strike": to_strike,
                         "exp_cf": exp_cf
                     })
-            if strikes_in_play and len(to_strike_moves) == len(strikes_in_play):  # patient move; wait for valley to sufficiently move away
+            # if strikes_in_play and len(to_strike_moves) == len(strikes_in_play):  # patient move; wait for valley to sufficiently move away
+            if strikes_in_play and len(to_strike_moves) >=2:  # patient move; wait for valley to sufficiently move away
                 print(f"all strikes in play can move {to_strike=} and yield +ve cash flow")
                 print('so, appending these moves to "cash collection moves"')
                 collection_moves += to_strike_moves
@@ -148,7 +164,7 @@ class Oct:
     def enter_market(self, xs):
         min_ask_strikes = self._find_valley(xs)
         print(f"\nentering the market at strikes: {self.strikes}")
-        self.strikes = min_ask_strikes
+        self.strikes = min_ask_strikes.to_list()
         s0, s1, s2, s3 = sorted(min_ask_strikes)
         self.settlement_guarantee = (s3 - s0) + (s2 - s1)
         cf = 0
