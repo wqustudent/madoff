@@ -44,24 +44,42 @@ class Allocator:
         )["QUOTE_READTIME"].unique().sort()
         print(f"\nquote times for expiry {chosen_expiry_date}: {quote_times}")
 
-        for qt in quote_times[:100]:  # TODO: remove slice after qual-check
-            xs = self.find_external_state(qt, chosen_expiry_date)
-            print(f"\n\n{'*'*20} ********************************** {'*'*20}")
-            print(f"{'*'*20} EVALUATING REBALANCING OPPORTUNITY {'*'*20}")
-            print(f"{'*'*17} ({qt=}) {'*'*16}")
-            print(f"{'*'*20} ********************************** {'*'*20}")
-            contract.rebalance(xs)
+        for qt in quote_times:
+            try:
+                xs = self.find_external_state(qt, chosen_expiry_date)
+                print(f"\n\n{'*'*20} ********************************** {'*'*20}")
+                print(f"{'*'*20} EVALUATING REBALANCING OPPORTUNITY {'*'*20}")
+                print(f"{'*'*17} ({qt=}) {'*'*16}")
+                print(f"{'*'*20} ********************************** {'*'*20}")
+                cf, sg = contract.rebalance(xs)
+                if cf:
+                    self.ladder[("NVDA", chosen_expiry_date)]["cash"].extend(pl.DataFrame({
+                        "quote_time": [qt],
+                        "flow": [cf],
+                        "settlement_guarantee": [sg],
+                    }))
+            except Exception as e:
+                print(f"\n\n\nAN ERROR OCCURRED WHILE REBALANCING WHEN {qt=}: {e}")
+            finally:
+                print(f"\n\n\n\n{'*'*20} ************** {'*'*20}")
+                print(f"{'*'*20} LADDER HISTORY {'*'*20}")
+                print(f"{'*'*20} *** (CASH) *** {'*'*20}")
+                print(self.ladder)
 
     def allocate_oct_to_ladder(self, xs, entry_time, chosen_expiry_date):
         print("\nallocating oct_ to ladder.")
         oct_ = Oct()
         cf = oct_.enter_market(xs)
-        print(f"{oct_.settlement_guarantee=}")
-        # self.ladder[("NVDA", chosen_expiry_date)] = oct_
+        sg = oct_.settlement_guarantee
+        print(f"{sg}")
         self.ladder[("NVDA", chosen_expiry_date)] = {
             "chosen_inflow": "oct",
             "contract": oct_,
-            "cash_flows": [(entry_time, cf)]
+            "cash": pl.DataFrame({
+                "quote_time": [entry_time],
+                "flow": [cf],
+                "settlement_guarantee": [sg],
+            }),
         }
         print("ladder: ")
         self.pp.pprint(self.ladder)
