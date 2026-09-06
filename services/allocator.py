@@ -15,13 +15,11 @@ class Allocator:
         self.outflow_now__inflow_later__choices = [
             "pair",  # call + put @ same strike: inflow is not guaranteed as instrument may expire at the strike price
             "quad",  # 2 pairs @ different strikes: market-maker guarantees cash inflow @settlement/expiry-date
-            "hex_",   # 3 pairs: allows for mechanical expansion of cash inflow guarantee @settlement as underlying moves up/down
-            "oct_",   # 4 pairs: allows for cash collection when moving within the extremes as well
+            "hex",   # 3 pairs: allows for mechanical expansion of cash inflow guarantee @settlement as underlying moves up/down
+            "oct",   # 4 pairs: allows for cash collection when moving within the extremes as well
             "dec",   # 5 pairs: may be suitable for highly volatile instruments (more cash collection during each step/move)
             "doz",   # 6 pairs: ^
         ]
-        self.chosen_inflow = "oct_"
-        self.cash = []
 
         self.pp = pprint.PrettyPrinter(indent=2)
 
@@ -39,18 +37,22 @@ class Allocator:
         print(f'\nchosen expiry date: {chosen_expiry_date}')
 
         xs = self.find_external_state(entry_time, chosen_expiry_date)
+        self.allocate_oct_to_ladder(xs, entry_time, chosen_expiry_date)
 
+    def allocate_oct_to_ladder(self, xs, entry_time, chosen_expiry_date):
         min_ask_strikes = Oct().find_valley(xs)
         print("\nallocating oct_ to ladder.")
         oct_ = Oct(min_ask_strikes)
         cf = oct_.enter_market(xs)
         print(f"{oct_.settlement_guarantee=}")
-        self.ladder[("NVDA", chosen_expiry_date)] = oct_
+        # self.ladder[("NVDA", chosen_expiry_date)] = oct_
+        self.ladder[("NVDA", chosen_expiry_date)] = {
+            "chosen_inflow": "oct",
+            "contract": oct_,
+            "cash_flows": [(entry_time, cf)]
+        }
         print("ladder: ")
         self.pp.pprint(self.ladder)
-        self.cash.append((entry_time, cf))
-        print("cash: ")
-        self.pp.pprint(self.cash)
 
     def ingest_chain(self):
         sub = self.ingester_prepper
