@@ -1,5 +1,6 @@
 matplotlib
 nbconvert
 nbformat>=5.10
+plotly
 polars
 pytest
