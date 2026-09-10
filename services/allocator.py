@@ -9,6 +9,7 @@ from oct import Oct
 class Allocator:
     def __init__(self):
         self.ingester_prepper = IngesterPrepper()
+        self.instrument = None
         self.option_chain = None
 
         self.ladder = {}
@@ -25,6 +26,7 @@ class Allocator:
 
     def run(self):
         self.ingest_chain()
+        instrument = self.instrument
         df = self.option_chain
 
         entry_time = df.select(
@@ -37,7 +39,7 @@ class Allocator:
         print(f'\nchosen expiry date: {chosen_expiry_date}')
 
         xs = self.find_external_state(entry_time, chosen_expiry_date)
-        contract = self.allocate_oct_to_ladder(xs, entry_time, chosen_expiry_date)
+        contract = self.allocate_oct_to_ladder(xs, entry_time, instrument, chosen_expiry_date)
 
         quote_times = df.filter(
             pl.col("EXPIRE_DATE") == chosen_expiry_date
@@ -53,7 +55,7 @@ class Allocator:
                 print(f"{'*'*20} ********************************** {'*'*20}")
                 cf, sg = contract.rebalance(xs)
                 if cf:
-                    self.ladder[("NVDA", chosen_expiry_date)]["cash"].extend(pl.DataFrame({
+                    self.ladder[(instrument, chosen_expiry_date)]["cash"].extend(pl.DataFrame({
                         "quote_time": [qt],
                         "flow": [cf],
                         "settlement_guarantee": [sg],
@@ -66,13 +68,13 @@ class Allocator:
                 print(f"{'*'*20} *** (CASH) *** {'*'*20}")
                 print(self.ladder)
 
-    def allocate_oct_to_ladder(self, xs, entry_time, chosen_expiry_date):
+    def allocate_oct_to_ladder(self, xs, entry_time, instrument, chosen_expiry_date):
         print("\nallocating oct_ to ladder.")
-        oct_ = Oct()
+        oct_ = Oct(chosen_expiry_date)
         cf = oct_.enter_market(xs)
         sg = oct_.settlement_guarantee
         print(f"{sg}")
-        self.ladder[("NVDA", chosen_expiry_date)] = {
+        self.ladder[(instrument, chosen_expiry_date)] = {
             "chosen_inflow": "oct",
             "contract": oct_,
             "cash": pl.DataFrame({
@@ -87,10 +89,11 @@ class Allocator:
 
     def ingest_chain(self):
         sub = self.ingester_prepper
-        sub.load_option_chain()
+        instrument, _ = sub.load_option_chain()
         df = sub.process_option_chain()
         print("\nloaded option chain: ", df)
         self.option_chain = df
+        self.instrument = instrument
 
     def find_available_expiry_dates(self, quote_time):
         df = self.option_chain

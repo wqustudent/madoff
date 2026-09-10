@@ -5,7 +5,8 @@ import polars as pl
 
 
 class Oct:
-    def __init__(self, strikes=None):
+    def __init__(self, expiry_date, strikes=None):
+        self.expiry_date = expiry_date
         self.strikes_count = 4
         self.strikes = strikes
         self.settlement_guarantee = None
@@ -177,6 +178,9 @@ class Oct:
         print(f"total cash flow: {cf}")
         return cf
 
+    def __repr__(self):
+        return f"Oct(expiry_date={self.expiry_date})"
+
 
 if __name__ == '__main__':
-    svc = Oct()
+    svc = Oct("2022-01-21")

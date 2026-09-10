@@ -9,13 +9,14 @@ class IngesterPrepper:
         self.option_chain = None
 
     def load_option_chain(self):
+        instrument = "SPY"
         df = pl.read_csv(
-            self.data_dir / "option-chain" / "nvda_2020_2022.csv",
+            self.data_dir / "option-chain" / "spy_2020_2022.csv",
             # try_parse_dates=True,
         )
         # print(df)
         self.option_chain = df
-        return df
+        return instrument, df
 
     def process_option_chain(self):
         df = self.option_chain.clone()

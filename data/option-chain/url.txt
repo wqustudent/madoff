@@ -1,1 +1,1 @@
-https://www.kaggle.com/datasets/kylegraupe/nvda-daily-option-chains-q1-2020-to-q4-2022
+https://www.kaggle.com/datasets/kylegraupe/spy-daily-eod-options-quotes-2020-2022
