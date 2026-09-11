@@ -56,9 +56,9 @@ class Allocator:
                 cf, sg = contract.rebalance(xs)
                 if cf:
                     self.ladder[(instrument, chosen_expiry_date)]["cash"].extend(pl.DataFrame({
-                        "quote_time": [qt],
-                        "flow": [cf],
-                        "settlement_guarantee": [sg],
+                        "QUOTE_TIME": [qt],
+                        "FLOW": [cf],
+                        "SETTLEMENT_GUARANTEE": [sg],
                     }))
             except Exception as e:
                 print(f"\n\n\nAN ERROR OCCURRED WHILE REBALANCING WHEN {qt=}: {e}")
@@ -78,9 +78,9 @@ class Allocator:
             "chosen_inflow": "oct",
             "contract": oct_,
             "cash": pl.DataFrame({
-                "quote_time": [entry_time],
-                "flow": [cf],
-                "settlement_guarantee": [sg],
+                "QUOTE_TIME": [entry_time],
+                "FLOW": [cf],
+                "SETTLEMENT_GUARANTEE": [sg],
             }),
         }
         print("ladder: ")

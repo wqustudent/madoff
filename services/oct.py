@@ -94,7 +94,6 @@ class Oct:
                         "to_strike": to_strike,
                         "exp_cf": exp_cf
                     })
-            # if strikes_in_play and len(to_strike_moves) == len(strikes_in_play):  # patient move; wait for valley to sufficiently move away
             if strikes_in_play and len(to_strike_moves) >=2:  # patient move; wait for valley to sufficiently move away
                 print(f"all strikes in play can move {to_strike=} and yield +ve cash flow")
                 print('so, appending these moves to "cash collection moves"')
