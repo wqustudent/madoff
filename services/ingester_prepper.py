@@ -8,7 +8,7 @@ class IngesterPrepper:
         self.data_dir = Path(__file__).parent.parent / "data"
         self.option_chain = None
 
-    def load_option_chain(self):
+    def load_SPY_option_chain(self):
         instrument = "SPY"
         df = pl.read_csv(
             self.data_dir / "option-chain" / "spy_2020_2022.csv",
@@ -61,5 +61,5 @@ class IngesterPrepper:
 
 if __name__ == "__main__":
     svc = IngesterPrepper()
-    _ = svc.load_option_chain()
+    _ = svc.load_SPY_option_chain()
     df = svc.process_option_chain()

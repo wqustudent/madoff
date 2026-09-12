@@ -5,13 +5,13 @@ from ingester_prepper import IngesterPrepper
 
 def test_load_option_chain():
     svc = IngesterPrepper()
-    _, df = svc.load_option_chain()
+    _, df = svc.load_SPY_option_chain()
     assert df.height > 0  # ensure there is data
 
 
 def test_process_option_chain():
     svc = IngesterPrepper()
-    _, _ = svc.load_option_chain()
+    _, _ = svc.load_SPY_option_chain()
     df = svc.process_option_chain()
 
     # ensure column names ok

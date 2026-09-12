@@ -89,7 +89,7 @@ class Allocator:
 
     def ingest_chain(self):
         sub = self.ingester_prepper
-        instrument, _ = sub.load_option_chain()
+        instrument, _ = sub.load_SPY_option_chain()
         df = sub.process_option_chain()
         print("\nloaded option chain: ", df)
         self.option_chain = df
