@@ -99,7 +99,7 @@ class Allocator:
         df = self.option_chain
         available_expiry_dates = df.filter(
             pl.col("QUOTE_READTIME") == quote_time
-        )["EXPIRE_DATE"].unique()
+        )["EXPIRE_DATE"].unique().sort()
         print(f"\navailable expiry dates on {quote_time=}: ", available_expiry_dates)
         return available_expiry_dates
 
