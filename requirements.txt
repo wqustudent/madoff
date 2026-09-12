@@ -1,4 +1,5 @@
 altair
+marketdata-sdk-py[pandas,polars]
 matplotlib
 nbconvert
 nbformat>=5.10
