@@ -25,7 +25,8 @@ class Allocator:
         self.pp = pprint.PrettyPrinter(indent=2)
 
     def run(self):
-        self.ingest_chain("SPY")
+        # self.ingest_chain("SPY")
+        self.ingest_chain("SNDK")
         instrument = self.instrument
         df = self.option_chain
 
