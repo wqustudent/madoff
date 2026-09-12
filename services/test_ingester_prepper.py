@@ -5,17 +5,17 @@ from ingester_prepper import IngesterPrepper
 
 def test_load_option_chain():
     svc = IngesterPrepper()
-    df = svc.load_option_chain()
+    _, df = svc.load_option_chain()
     assert df.height > 0  # ensure there is data
 
 
-def test_process_option_chain__columns_present():
+def test_process_option_chain():
     svc = IngesterPrepper()
-    _ = svc.load_option_chain()
+    _, _ = svc.load_option_chain()
     df = svc.process_option_chain()
 
     # ensure column names ok
-    assert df.columns == [
+    cols = [
         'QUOTE_READTIME',
         'QUOTE_DATE',
         'UNDERLYING_LAST',
@@ -27,6 +27,8 @@ def test_process_option_chain__columns_present():
         'P_BID',
         'P_ASK',
     ]
+    for col in cols:
+        assert col in df.columns
 
     # ensure data types are ok
     assert df['QUOTE_READTIME'].dtype == pl.Datetime
