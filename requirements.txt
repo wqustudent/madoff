@@ -1,3 +1,4 @@
+altair
 matplotlib
 nbconvert
 nbformat>=5.10
