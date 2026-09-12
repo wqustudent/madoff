@@ -5,3 +5,5 @@ nbformat>=5.10
 plotly
 polars
 pytest
+python-dotenv
+yfinance
