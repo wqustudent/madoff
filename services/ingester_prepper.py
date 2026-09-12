@@ -1,5 +1,6 @@
 from pathlib import Path
 
+import pandas as pd
 import polars as pl
 
 
@@ -7,6 +8,28 @@ class IngesterPrepper:
     def __init__(self):
         self.data_dir = Path(__file__).parent.parent / "data"
         self.option_chain = None
+
+    def load_option_chain(self, instrument: str):
+        if instrument == "SPY":
+            return self.load_SPY_option_chain()
+        elif instrument == "SNDK":
+            return self.load_marketdata_app_downloaded__option_chain("SNDK")
+        else:
+            return None, None
+
+    def load_marketdata_app_downloaded__option_chain(self, instrument: str):
+        data_path = {
+            "SNDK": self.data_dir / "option-chain" / "SNDK__exp_20261218.csv"
+        }
+        if instrument not in data_path.keys():
+            print(f"data not found for {instrument=}")
+            return None, None
+
+        df = pl.read_csv(
+            data_path[instrument],
+        )
+        self.option_chain = df
+        return instrument, df
 
     def load_SPY_option_chain(self):
         instrument = "SPY"
@@ -18,7 +41,66 @@ class IngesterPrepper:
         self.option_chain = df
         return instrument, df
 
-    def process_option_chain(self):
+    def process_option_chain(self, instrument: str):
+        if instrument == "SPY":
+            return self.process_SPY_option_chain()
+        elif instrument == "SNDK":
+            return self.process_marketdata_app_downloaded__option_chain()
+        else:
+            return None
+
+    def process_marketdata_app_downloaded__option_chain(self):
+        df = self.option_chain.clone()
+        df = (
+            df.select(
+                pl.col("expiration").str.to_datetime(time_zone="UTC").dt.date(),
+                pl.col("strike"),
+                pl.col("dte"),
+                pl.col("updated").str.to_datetime(time_zone="UTC"),
+                pl.col("underlyingPrice"),
+                pl.col("bid"),
+                pl.col("ask"),
+                pl.col("side")
+            ).rename({
+                "expiration": "EXPIRE_DATE",
+                "strike": "STRIKE",
+                "dte": "DTE",
+                "updated": "QUOTE_READTIME",
+                "underlyingPrice": "UNDERLYING_LAST",
+                "bid": "BID",
+                "ask": "ASK",
+            }).with_columns(
+                QUOTE_DATE=pl.col("QUOTE_READTIME").dt.date(),
+                STRIKE=pl.col("STRIKE").cast(pl.Float64),
+            ).pivot(
+                on="side",
+                index=[
+                    "QUOTE_DATE",
+                    "QUOTE_READTIME",
+                    "EXPIRE_DATE",
+                    "DTE",
+                    "STRIKE",
+                    "UNDERLYING_LAST",
+                ],
+                values=[
+                    "BID",
+                    "ASK",
+                ]
+            ).rename({
+                "BID_call": "C_BID",
+                "ASK_call": "C_ASK",
+                "BID_put": "P_BID",
+                "ASK_put": "P_ASK",
+            })
+        )
+        print(df)
+        print(df.columns)
+        print(df.null_count())
+        print(df.describe())
+        print(type(df.null_count()))
+        return df
+
+    def process_SPY_option_chain(self):
         df = self.option_chain.clone()
         df = (
             df
@@ -61,5 +143,7 @@ class IngesterPrepper:
 
 if __name__ == "__main__":
     svc = IngesterPrepper()
-    _ = svc.load_SPY_option_chain()
-    df = svc.process_option_chain()
+    # _ = svc.load_SPY_option_chain()
+    # df = svc.process_SPY_option_chain()
+    svc.load_option_chain("SNDK")
+    svc.process_option_chain("SNDK")

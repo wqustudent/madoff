@@ -25,7 +25,7 @@ class Allocator:
         self.pp = pprint.PrettyPrinter(indent=2)
 
     def run(self):
-        self.ingest_chain()
+        self.ingest_chain("SPY")
         instrument = self.instrument
         df = self.option_chain
 
@@ -87,10 +87,10 @@ class Allocator:
         self.pp.pprint(self.ladder)
         return oct_
 
-    def ingest_chain(self):
+    def ingest_chain(self, instrument):
         sub = self.ingester_prepper
-        instrument, _ = sub.load_SPY_option_chain()
-        df = sub.process_option_chain()
+        _, _ = sub.load_option_chain(instrument)
+        df = sub.process_option_chain(instrument)
         print("\nloaded option chain: ", df)
         self.option_chain = df
         self.instrument = instrument

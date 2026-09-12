@@ -5,7 +5,7 @@ from allocator import Allocator
 
 def test_ingest_chain():
     svc = Allocator()
-    svc.ingest_chain()
+    svc.ingest_chain("SPY")
 
     assert svc.instrument
 
@@ -45,7 +45,7 @@ def test_ingest_chain():
 
 def test_find_available_expiry_dates():
     svc = Allocator()
-    svc.ingest_chain()
+    svc.ingest_chain("SPY")
 
     qt = svc.option_chain.select(
         pl.col("QUOTE_READTIME")
@@ -60,7 +60,7 @@ def test_find_available_expiry_dates():
 
 def test_find_external_state():
     svc = Allocator()
-    svc.ingest_chain()
+    svc.ingest_chain("SPY")
 
     qt = svc.option_chain.select(
         pl.col("QUOTE_READTIME")
