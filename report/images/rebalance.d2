@@ -1,0 +1,25 @@
+direction: right
+Enter Market: {
+
+  play: What An Exciting | Terrible" day {
+    shape: sequence_diagram
+    tr: Trader
+    ds: (by-definition) Diversified Structure
+    al: Allocator
+    me: Me
+    mm: Mister Market
+
+    mm.play -> me.play: What An Exciting|Terrible day\nDid you hear about THIS?
+
+    me.play -> al.play: rebalance my option-ladder
+    al.play -> ds.play: here are the market quotes. rebalance
+    ds.play -> ds.play: do I need to rebalance?
+    ds.play -> ds.play: HOW to rebalance?
+    ds.play -> tr.play: rebalance
+    tr.play -> ds.play: done + cash | promise
+    ds.play -> al.play: done + cash | promise
+    al.play -> me.play: done + cash | promise
+
+    me.play -> mm.play: What An Exciting | Terrible day\nI will rebalance
+  }
+}

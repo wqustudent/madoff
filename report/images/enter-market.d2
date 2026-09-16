@@ -1,0 +1,28 @@
+direction: right
+Enter Market: {
+
+  play: Will You Play? {
+    shape: sequence_diagram
+    tr: Trader
+    ds: (by-definition) Diversified Structure
+    al: Allocator
+    me: Me
+    mm: Mister Market
+
+    mm.play -> me.play: Hello there!\nWant to play?
+
+    me.play -> al.play: Allocate DS to my option-ladder
+    al.play -> ds.play: Are you diversified by-definition?
+    ds.play -> al.play: this is my STRUCTURE
+    al.play -> ds.play: Can you rebalance?
+    ds.play -> al.play: this is HOW I rebalance
+    al.play -> ds.play: here's some cash. enter market
+    ds.play -> tr.play: enter market
+    tr.play -> ds.play: done
+    ds.play -> al.play: done
+    al.play -> al.play: add DS to option-ladder
+    al.play -> me.play: done.
+
+    me.play -> mm.play: Sure
+  }
+}
