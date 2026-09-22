@@ -1,0 +1,14 @@
+direction: right
+After: Mechanical {
+    shape: sequence_diagram
+    me: Me
+    mm: Mister Market
+    mm.play -> me.play: Hello there!\nWant to play?
+    me.play -> mm.play: Sure
+
+    mm.up -> me.up: What an exciting day!!\nDid you hear about THIS?
+    me.up -> mm.up: What an exciting day Mr. Market!!\nI'll rebalance
+
+    mm.down -> me.down: What a terrible day!!\nDid you hear about THIS?
+    me.down -> mm.down: What a terrible day Mr. Market!!\nI'll rebalance
+}

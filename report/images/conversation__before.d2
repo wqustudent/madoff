@@ -1,0 +1,23 @@
+direction: right
+Before: Confusion & Regret {
+    shape: sequence_diagram
+    me: Me
+    mm: Mister Market
+    mm.play -> me.play: Hello there!\nWant to play?
+    me.play -> me.play: What should I do?
+    me.play -> mm.play: idk
+
+    mm.up -> me.up: What an exciting day!!\nDid you hear about THIS?
+    me.up -> me.up: What??\nPeople are about to go\nto another planet?
+    me.up -> me.up: Have I already\nmissed the market rally?
+    me.up -> mm.up: Will the price increase further?
+    mm.up -> me.up: It sure can!\nBut it can also decrease!
+    me.up -> mm.up: Whatever.\nI'll invest some
+
+    mm.down -> me.down: What a terrible day!!\nDid you hear about THIS?
+    me.down -> me.down: What??\nWorld is about to end?
+    me.down -> me.down: Should I exit &\n stop further loss?
+    me.down -> mm.down: Will the price fall further?
+    mm.down -> me.down: It sure can!\nBut it can also increase!
+    me.down -> me.down: Noone cares about money if\n the world is about to end
+}
