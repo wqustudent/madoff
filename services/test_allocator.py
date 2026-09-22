@@ -63,7 +63,7 @@ def test_find_available_expiry_dates():
 def test_find_external_state():
     svc = Allocator()
     for instrument in ["SPY", "SNDK"]:
-        svc.ingest_chain("SPY")
+        svc.ingest_chain(instrument)
 
         qt = svc.option_chain.select(
             pl.col("QUOTE_READTIME")
