@@ -1,12 +1,13 @@
 import polars as pl
 
 from allocator import Allocator
+from allocator import Intent
 
 
 def test_ingest_chain():
     svc = Allocator()
     for instrument in ["SPY", "SNDK"]:
-        svc.ingest_chain(instrument)
+        svc.ingest_chain(instrument, intent=Intent.LADDER)
 
         assert svc.instrument
 
@@ -47,7 +48,7 @@ def test_ingest_chain():
 def test_find_available_expiry_dates():
     svc = Allocator()
     for instrument in ["SPY", "SNDK"]:
-        svc.ingest_chain(instrument)
+        svc.ingest_chain(instrument, intent=Intent.LADDER)
 
         qt = svc.option_chain.select(
             pl.col("QUOTE_READTIME")
@@ -63,7 +64,7 @@ def test_find_available_expiry_dates():
 def test_find_external_state():
     svc = Allocator()
     for instrument in ["SPY", "SNDK"]:
-        svc.ingest_chain(instrument)
+        svc.ingest_chain(instrument, intent=Intent.LADDER)
 
         qt = svc.option_chain.select(
             pl.col("QUOTE_READTIME")

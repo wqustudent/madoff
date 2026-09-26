@@ -1,9 +1,15 @@
+from enum import Enum
 import pprint
 
 import polars as pl
 
 from ingester_prepper import IngesterPrepper
 from oct import Oct
+
+
+class Intent(Enum):
+    LADDER = "LADDER"
+    INCOME = "INCOME"
 
 
 class Allocator:
@@ -26,7 +32,7 @@ class Allocator:
 
     def run(self):
         # self.ingest_chain("SPY")
-        self.ingest_chain("SNDK")
+        self.ingest_chain("SNDK", intent=Intent.LADDER)
         instrument = self.instrument
         df = self.option_chain
 
@@ -88,10 +94,14 @@ class Allocator:
         self.pp.pprint(self.ladder)
         return oct_
 
-    def ingest_chain(self, instrument):
+    def ingest_chain(self, instrument, intent: Intent):
         sub = self.ingester_prepper
         _, _ = sub.load_option_chain(instrument)
-        df = sub.process_option_chain__for_ladder(instrument)
+        df = pl.DataFrame()
+        if intent == Intent.LADDER:
+            df = sub.process_option_chain__for_ladder(instrument)
+        elif intent == Intent.INCOME:
+            df = sub.process_option_chain__for_income(instrument)
         print("\nloaded option chain: ", df)
         self.option_chain = df
         self.instrument = instrument
