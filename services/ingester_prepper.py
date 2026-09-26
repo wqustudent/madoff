@@ -137,13 +137,32 @@ class IngesterPrepper:
         # print(df.null_count())
         # print(df.describe())
         # print(type(df.null_count()))
-        self.option_chain = df
+        return df
+
+    def process_option_chain__for_income(self, instrument: str):
+        if instrument == "SPY":
+            return self.process_SPY_option_chain__for_income()
+        elif instrument == "SNDK":
+            return self.process_marketdata_app_downloaded__option_chain__for_income()
+        else:
+            return None
+
+    def process_SPY_option_chain__for_income(self):
+        df = self.option_chain.clone()
+        df = (
+            df
+        )
+        return df
+
+    def process_marketdata_app_downloaded__option_chain__for_income(self):
+        df = self.option_chain.clone()
+        df = (
+            df
+        )
         return df
 
 
 if __name__ == "__main__":
     svc = IngesterPrepper()
-    # _ = svc.load_SPY_option_chain()
-    # df = svc.process_SPY_option_chain__for_ladder()
-    svc.load_option_chain("SNDK")
-    svc.process_option_chain__for_ladder("SNDK")
+    svc.load_option_chain("SPY")
+    svc.process_option_chain__for_income("SPY")
