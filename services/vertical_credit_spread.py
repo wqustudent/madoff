@@ -27,8 +27,9 @@ class VerticalCreditSpread:
         strikes_and_cashflow = self.calculate_strikes_and_cash_flow(xs)
         net_cf = sum([x[1] for x in strikes_and_cashflow])
         if net_cf > 0:
-            print("VerticalCreditSpread: opening positions for income")
+            print("\nVerticalCreditSpread: opening positions for income")
             self.open = True
+            print(f'cash flow: {net_cf:.2f}')
             return net_cf
         else:
             print("VerticalCreditSpread: income opportunity not available at default values of delta")
@@ -101,6 +102,38 @@ class VerticalCreditSpread:
         self.pp.pprint(out)
         return out
 
+    def close_positions(self, xs: pl.DataFrame):
+        cf = 0
+        if not self.open:
+            print("\nVerticalCreditSpread: no open positions")
+            return cf
+        print("\nVerticalCreditSpread: closing positions...")
+
+        # sell long positions
+        cf += xs.filter(
+            pl.col("STRIKE") == self.long_leg_down
+        )[0, "P_BID"]
+        cf += xs.filter(
+            pl.col("STRIKE") == self.long_leg_up
+        )[0, "C_BID"]
+
+        # buy short positions
+        cf -= xs.filter(
+            pl.col("STRIKE") == self.short_leg_down
+        )[0, "P_ASK"]
+        cf -= xs.filter(
+            pl.col("STRIKE") == self.short_leg_up
+        )[0, "C_ASK"]
+
+        self.short_leg_down = None
+        self.long_leg_down = None
+        self.short_leg_up = None
+        self.long_leg_up = None
+        self.open = False
+
+        print(f"cash flow: {cf:.2f}")
+        return cf
+
 
 if __name__ == "__main__":
     al = Allocator()
@@ -112,12 +145,13 @@ if __name__ == "__main__":
     ).unique().sort("QUOTE_READTIME")[0].item()
     print("\nquote time", qt)
 
-    available_expiry_dates = al.find_available_expiry_dates(qt)
+        available_expiry_dates = al.find_available_expiry_dates(qt)
 
-    chosen_expiry_date = available_expiry_dates[1]
-    print(f'\nchosen expiry date: {chosen_expiry_date}')
+        chosen_expiry_date = available_expiry_dates[0]
+        print(f'\nchosen expiry date: {chosen_expiry_date}')
 
-    xs = al.find_external_state(qt, chosen_expiry_date)
+        xs = al.find_external_state(qt, chosen_expiry_date)
 
     vcs = VerticalCreditSpread("SPY", chosen_expiry_date)
     vcs.enter(xs)
+    vcs.close_positions(xs)
