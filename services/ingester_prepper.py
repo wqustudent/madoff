@@ -41,15 +41,15 @@ class IngesterPrepper:
         self.option_chain = df
         return instrument, df
 
-    def process_option_chain(self, instrument: str):
+    def process_option_chain__for_ladder(self, instrument: str):
         if instrument == "SPY":
-            return self.process_SPY_option_chain()
+            return self.process_SPY_option_chain__for_ladder()
         elif instrument == "SNDK":
-            return self.process_marketdata_app_downloaded__option_chain()
+            return self.process_marketdata_app_downloaded__option_chain__for_ladder()
         else:
             return None
 
-    def process_marketdata_app_downloaded__option_chain(self):
+    def process_marketdata_app_downloaded__option_chain__for_ladder(self):
         df = self.option_chain.clone()
         df = (
             df.select(
@@ -100,7 +100,7 @@ class IngesterPrepper:
         print(type(df.null_count()))
         return df
 
-    def process_SPY_option_chain(self):
+    def process_SPY_option_chain__for_ladder(self):
         df = self.option_chain.clone()
         df = (
             df
@@ -144,6 +144,6 @@ class IngesterPrepper:
 if __name__ == "__main__":
     svc = IngesterPrepper()
     # _ = svc.load_SPY_option_chain()
-    # df = svc.process_SPY_option_chain()
+    # df = svc.process_SPY_option_chain__for_ladder()
     svc.load_option_chain("SNDK")
-    svc.process_option_chain("SNDK")
+    svc.process_option_chain__for_ladder("SNDK")

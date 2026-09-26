@@ -9,13 +9,13 @@ def test_load_option_chain():
     assert df_spy.height > 0  # ensure there is data
 
 
-def test_process_option_chain():
+def test_process_option_chain__for_ladder():
     svc = IngesterPrepper()
     _, _ = svc.load_option_chain("SPY")
-    df_spy = svc.process_option_chain("SPY")
+    df_spy = svc.process_option_chain__for_ladder("SPY")
 
     _, _ = svc.load_option_chain("SNDK")
-    df_sndk = svc.process_option_chain("SNDK")
+    df_sndk = svc.process_option_chain__for_ladder("SNDK")
 
     # ensure column names ok
     cols = [
