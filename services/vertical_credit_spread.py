@@ -1,7 +1,7 @@
 import polars as pl
 
 
-class VerticalCreditSpreader:
+class VerticalCreditSpreadj:
     def __init__(self):
         self.safety_margin_up = None  # strike above underlying
         self.safety_margin_down = None  # strike below underlying
@@ -11,4 +11,4 @@ class VerticalCreditSpreader:
 
 
 if __name__ == "__main__":
-    svc = VerticalCreditSpreader()
+    svc = VerticalCreditSpread()
