@@ -6,7 +6,7 @@ import random
 import matplotlib.pyplot as plt
 import polars as pl
 
-from allocator import Allocator
+from allocator import Allocator, Intent
 
 
 class Visualizer:
@@ -124,7 +124,7 @@ class Visualizer:
 if __name__ == "__main__":
     # use allocator (& ingestor) to find a cross-section / external state
     al = Allocator()
-    al.ingest_chain("SNDK")
+    al.ingest_chain("SNDK", intent=Intent.LADDER)
 
     qt = al.option_chain.select(
         pl.col("QUOTE_READTIME")
