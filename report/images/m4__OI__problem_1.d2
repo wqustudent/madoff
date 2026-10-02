@@ -1,0 +1,20 @@
+direction: right
+Problem: Problem with Options "Investing" {
+
+  problem: House Always Wins {
+    shape: sequence_diagram
+    me: Wannabe Investor
+    oi: Options "Investor"
+    mm: Market
+
+    mm.buy -> oi.buy: Spin the reels
+    oi.buy -> mm.buy: Spin, Spin, Spin
+    mm.buy -> oi.buy: You got 2 out of 3 correct\nYou LOSE
+
+    oi.sell -> mm.sell: YOU spin the reels
+    mm.sell -> oi.sell: Black Swan\n-----\nGet Out &\nNEVER come back
+
+    me.why -> me.why: Do I even want to play?
+
+  }
+}

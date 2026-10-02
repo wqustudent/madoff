@@ -1,0 +1,27 @@
+direction: right
+Problem: Problem with Fundamental Investing {
+
+  problem: Keeping Up With The Joanses {
+    shape: sequence_diagram
+    js: Joanses
+    me: Wannabe Investor
+    fi: Fundamental Investor
+
+    fi.entry -> me.entry: we invest in\nGreat Companies\nat a Fair Price
+    me.entry -> fi.entry: WOW !!\nplease take this money\n& invest it
+
+    js.wait -> me.wait: I invested in X.\nIt's 2X right now
+    me.wait -> fi.wait: have you invested?
+    fi.wait -> me.wait: No.\nMarket isn't Fair right now
+    me.wait -> js.wait: Good for you.\nMy FI is waiting\nfor a Great Company
+
+    js.waitt -> me.waitt: I invested in Y.\nIt's become 2Y now
+    me.waitt -> fi.waitt: have you invested?
+    fi.waitt -> me.waitt: No.\nMarket isn't Fair right now
+    me.waitt -> js.waitt: Good for you.\nMy FI is waiting\nfor a Great Company
+
+    fi.invested -> me.invested: we have invested in XYZ\n(at a fair price)
+    me.invested -> fi.invested: I'm so happy you did that\nbefore my neighbour invested in Z
+
+  }
+}
