@@ -69,17 +69,28 @@ class Visualizer:
         print(positions)
         pair_quotes = self._calculate_pair_mids(xs)
 
-        fig, ax = plt.subplots(figsize=(15, 10))
-
-        # plot pair cost
-        plt.plot(pair_quotes["STRIKE"], pair_quotes["PAIR_MID"], "-b", label="PAIR COST")
-        plt.axvline(x=xs['UNDERLYING_LAST'][0], ymin=0.05, ymax=0.9, color='k', linestyle='--', label="UNDERLYING")
+        fig = self.visualize_pair_costs(xs)
 
         self._plot_positions(pair_quotes, positions)
         self._plot_settlement_guarantee(pair_quotes, positions)
 
         plt.legend()
         fig.savefig(self.images_dir / f"positions{file_suffix}.png")
+
+    def visualize_pair_costs(self, xs: pl.DataFrame):
+        pair_quotes = self._calculate_pair_mids(xs)
+
+        fig, ax = plt.subplots(figsize=(15, 10))
+
+        # plot pair cost
+        plt.plot(pair_quotes["STRIKE"], pair_quotes["PAIR_MID"], "-b", label="PAIR COST")
+        plt.axvline(x=xs['UNDERLYING_LAST'][0], ymin=0.05, ymax=0.9, color='k', linestyle='--', label="PRICE OF UNDERLYING")
+
+        plt.title("Implied Settled Price of Underlying\nis Different From Current Price\nUnderlying=$SNDK, QUOTE_DATE=2026-06-15, EXPIRE_DATE=2026-12-18")
+        plt.legend()
+        fig.savefig(self.images_dir / "paircosts.png")
+
+        return fig
 
     def _plot_positions(self, pair_quotes: pl.DataFrame, positions: list[float], alpha=1.):
 
