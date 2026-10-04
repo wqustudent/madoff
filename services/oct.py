@@ -24,13 +24,19 @@ class Oct:
             trader = None  # not using trader/platform for this demonstration
             prev_guarantee = self.settlement_guarantee
             if trader:
+                # not doing actual trades for the study/paper
                 pass
             else:
                 self.strikes.remove(from_strike)
                 self.strikes.append(to_strike)
                 s0, s1, s2, s3 = sorted(self.strikes)
-                self.settlement_guarantee = (s3 - s0) + (s2 - s1)
-            return exp_cf, self.settlement_guarantee
+                new_guarantee = (s3 - s0) + (s2 - s1)
+                if exp_cf + new_guarantee > prev_guarantee:
+                    self.settlement_guarantee = (s3 - s0) + (s2 - s1)
+                    return exp_cf, self.settlement_guarantee
+                else:
+                    print(f"NO MOVE: DECREASE IN SETTLEMENT GUARANTEE IS LESS THAN CASH FLOW FROM MOVE.")
+                    return 0, self.settlement_guarantee
         else:
             return 0, self.settlement_guarantee
 
