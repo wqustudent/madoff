@@ -1,2 +1,6 @@
 - done
   - ready report for submission: module4 version1
+  - 
+  - module6: version3
+    - added more recent data for $SNDK
+    - improved cashflow plots
