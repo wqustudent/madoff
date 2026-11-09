@@ -1,4 +1,4 @@
-# madoff
+# capstone
 
 ## Steps to reproduce the results
 - $SPY option-chain data is not uploaded to this repo because Github does not allow upload of files > 100MB in size. So, you would need to download data from source defined in data/option-chain/url.txt
