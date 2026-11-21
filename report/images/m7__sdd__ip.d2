@@ -1,0 +1,23 @@
+direction: right
+IngestorPrepper(): {
+
+  play: Loads & Preprocesses Data {
+    shape: sequence_diagram
+    db: database (or filesystem)
+    ip: IngestorPrepper()
+
+    load_data {
+        ip.load -> db.load: <ticker>
+        db.load -> ip.load: option\-chain
+        ip.load -> ip.load: save option\-chain\nfor processing, and\nfor other services
+    }
+
+    process_option_chain__for_ladder {
+        ip.prep -> ip.prep: validate column names
+        ip.prep -> ip.prep: add bid & ask\nfor PAIR cost
+        ip.prep -> ip.prep: validate data\-types\n(float, string etc)
+        ip.prep -> ip.prep: remove null values
+    }
+
+  }
+}

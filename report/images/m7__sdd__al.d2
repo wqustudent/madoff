@@ -1,0 +1,27 @@
+direction: right
+Allocator(): {
+
+  play: Enters Market & Rebalances {
+    shape: sequence_diagram
+    ip: IngestorPrepper
+    al: Allocator
+    ds: DiversifiedStructure(type=Oct)
+
+    enter_market {
+        al.enter -> ip.enter: <ticker> <expiry_date> <quote_date>
+        ip.enter -> al.enter: quotes
+        al.enter -> ds.enter: enter_market(xs=quotes)
+        ds.enter -> al.enter: done + settlement_guarantee
+    }
+
+    loop until expiry date {
+        rebalance {
+            al.reb -> ip.reb: <ticker> <expiry_date> <quote_date>
+            ip.reb -> al.reb: quotes
+            al.reb -> ds.reb: rebalance(xs=quotes)
+            ds.reb -> al.reb: done + cash + (new) settlement_guarantee
+        }
+    }
+
+  }
+}

@@ -1,0 +1,26 @@
+direction: right
+DiversifiedStructure(type=Oct): {
+
+  play: Enters Market & Rebalances {
+    shape: sequence_diagram
+    al: Allocator
+    ds: Oct
+
+    enter_market {
+        al.enter -> ds.enter: enter_market(xs=quotes)
+        ds.enter -> ds.enter: find_valley_strikes
+        ds.enter -> ds.enter: calculate cashflow to enter @vally strikes
+        ds.enter -> ds.enter: udpate self.strikes & self.cashflow & self.settlement_guarantee
+    }
+
+    rebalance {
+        al.reb -> ds.reb: rebalance(xs=quotes)
+        ds.reb -> ds.reb: compare self.strikes\nvs. valley strikes
+        ds.reb -> ds.reb: calculate cashflow\nto move a PAIR from self.strike -> valley_strike
+        ds.reb -> ds.reb: calculate (new) settlement_guarantee for (potential) move
+        ds.reb -> ds.reb: move if cashflow & guarantee improves
+        ds.reb -> ds.reb: udpate self.strikes & self.cashflow & self.settlement_guarantee
+    }
+
+  }
+}
