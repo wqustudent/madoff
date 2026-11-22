@@ -14,17 +14,20 @@ class Visualizer:
         self.HERE = Path(__file__).parent
         self.images_dir = self.HERE / "images"
 
+    def visualize_move2(self, xss: list[pl.DataFrame], positions: list[float], move: tuple[float, float]):
+        pass
+
     def visualize_move(self, xss: list[pl.DataFrame], positions: list[float], move: tuple[float, float]):
         fig, ax = plt.subplots(figsize=(15, 10))
 
-        # previously
-        xs_ = xss[0]
-        pair_quotes_ = self._calculate_pair_mids(xs_)
-
-        plt.plot(pair_quotes_["STRIKE"], pair_quotes_["PAIR_MID"], "-.b", label="PREVIOUS COST")
-        plt.axvline(x=xs_['UNDERLYING_LAST'][0], ymin=0.05, ymax=0.9, color='k', linestyle='-.', label="UNDERLYING")
-
-        self._plot_positions(pair_quotes_, positions, alpha=0.2)
+        # # previously
+        # xs_ = xss[0]
+        # pair_quotes_ = self._calculate_pair_mids(xs_)
+        #
+        # plt.plot(pair_quotes_["STRIKE"], pair_quotes_["PAIR_MID"], "-.b", label="PREVIOUS COST")
+        # plt.axvline(x=xs_['UNDERLYING_LAST'][0], ymin=0.05, ymax=0.9, color='k', linestyle='-.', label="UNDERLYING")
+        #
+        # self._plot_positions(pair_quotes_, positions, alpha=0.2)
 
         # move
         from_, to = move[0], move[1]
@@ -168,6 +171,7 @@ if __name__ == "__main__":
     # visualize move
     move = (1200, 1500)
     vis.visualize_move(xss, pair_strikes, move)
+    # vis.visualize_move2(xss, pair_strikes, move)
 
     # visualize settlement cash guarantee after rebalancing
     vis.visualize_positions(xss[1], pair_strikes, file_suffix="_after_rebalancing")
