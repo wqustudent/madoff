@@ -4,3 +4,7 @@
   - module6: version3
     - added more recent data for $SNDK
     - improved cashflow plots
+  - module 7:
+    - added more recent data for $SNDK
+    - submitted: project report
+    - submitted: solution design document
